@@ -35,7 +35,7 @@ Clone the repository and run the install script:
     git clone https://github.com/execRooted/Tasky.git
 
 ```
-cd tasky
+cd Tasky
 ```
 ```
 chmod +x install_tasky.sh
