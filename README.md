@@ -4,6 +4,8 @@
 It helps you manage tasks with priorities and categories.
 
 > Built for Arch Linux, but should work on most Linux distros with .NET support.
+---
+![Tasky](photos/tasky.png)
 
 ---
 
