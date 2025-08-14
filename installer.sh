@@ -87,7 +87,17 @@ echo ""
 echo "🎉 System-wide installation complete!"
 echo "You can now run Tasky from anywhere by typing:"
 echo "  tasky"
+
+
+
+
 echo ""
-echo "To uninstall, run:"
-echo "  sudo rm /usr/local/bin/tasky"
-echo "  sudo rm /usr/share/applications/tasky.desktop"
+
+
+
+
+
+
+echo "Thanks for installing my program"
+echo "Made by execRooted"
+echo "github: github.com/execRooted/Tasky"
