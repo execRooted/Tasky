@@ -45,7 +45,7 @@ chmod +x installer.sh
 ```
 
 
-***The installer will:***
+***The installer:***
 
 - Focuses on system-wide installation (root required)
 
