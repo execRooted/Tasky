@@ -38,24 +38,25 @@ Clone the repository and run the install script:
 cd Tasky
 ```
 ```
-chmod +x install_tasky.sh
+chmod +x installer.sh
 ```
 ```
-./install_tasky.sh
+./installer.sh
 ```
 
 
 ***The installer will:***
 
-- Install required dependencies
-- Create a .NET project if missing
-- Copy the program source
-- Add Newtonsoft.Json automatically
-- Build a self-contained single-file executable
-- Install it to ~/.local/bin/tasky
-- Add ~/.local/bin to your PATH (if missing)
+- Focuses on system-wide installation (root required)
 
+- Uses Arch-specific tools (yay, pacman)
 
+ - Creates a dotnet DLL launcher rather than single-file binary
+
+ - Adds optional desktop entry (GUI integration)
+
+ - Installs mpv for sound notifications
+   
 ---
 
 
@@ -76,10 +77,10 @@ Tasks are saved in the same directory as the executable unless configured otherw
 **To completely remove Tasky, run these commands in the project directory:**
 
 ```
-chmod +x uninstall_tasky.sh
+chmod +x uninstaller.sh
 ```
 ```
-./uninstall_tasky.sh
+./uninstaller.sh
 ```
 
 The uninstaller will:
@@ -89,9 +90,11 @@ The uninstaller will:
    - Delete the local .NET project folder
 
    - Optionally remove ~/.local/bin from your PATH if empty
+
+   - Delete the /var/lib/tasky directory created during instalation
    
    ---
    
    <h3>💡 Notes</h3>
 
-   -  Task data is stored in tasks.json in the working directory by default — you can change this to a fixed config path if desired.
+   -  Task data is stored in tasks.json in the /var/lib/tasky directory by default — you can change this to whatever you prefer. It was added there for global access.
