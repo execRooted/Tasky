@@ -3,7 +3,7 @@
 **Tasky** is a colorful, terminal-based to-do manager written in C# for Arch Linux.  
 It helps you manage tasks with priorities and categories.
 
-> Built for Arch Linux, but should work on most Linux distros with .NET support.
+> Built for Arch Linux, with support for all major Linux distros.
 ---
 ![Tasky](photos/tasky.png)
 
@@ -49,7 +49,7 @@ chmod +x installer.sh
 
 - Focuses on system-wide installation (root required)
 
-- Uses Arch-specific tools (yay, pacman)
+- Uses cross-system tools, depending on what distro it detected
 
  - Creates a dotnet DLL launcher rather than single-file binary
 
