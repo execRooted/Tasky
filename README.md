@@ -63,7 +63,7 @@ chmod +x installer.sh
 <h3>Once installed, simply run:</h3>
 
 ```
-tasky 
+sudo tasky 
 ```
 No matter where you are in your terminal, Tasky will start.
 Tasks are saved in the same directory as the executable unless configured otherwise.
