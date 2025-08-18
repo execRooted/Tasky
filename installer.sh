@@ -1,76 +1,117 @@
 #!/bin/bash
+set -e
+clear
 
-# Tasky System-Wide Installer for Arch Linux
-# Version 2.0
+echo "🚀 === Tasky System-Wide Installer ==="
 
-echo "🚀 Starting Tasky system-wide installation..."
+# Function to detect Linux family
+detect_linux() {
+    if command -v pacman &> /dev/null; then
+        echo "arch"
+    elif command -v apt &> /dev/null; then
+        echo "debian"
+    elif command -v dnf &> /dev/null; then
+        echo "fedora"
+    elif command -v zypper &> /dev/null; then
+        echo "opensuse"
+    else
+        echo "unsupported"
+    fi
+}
 
-# Check if running as root
-if [ "$EUID" -ne 0 ]; then
-    echo "🔵 This installer needs root privileges for system-wide installation"
-    sudo -v || (echo "❌ Failed to get root privileges"; exit 1)
+LINUX_FAMILY=$(detect_linux)
+if [ "$LINUX_FAMILY" = "unsupported" ]; then
+    echo "❌ Unsupported OS"
+    exit 1
 fi
 
-# Check if yay is installed (for AUR packages)
-if ! command -v yay &> /dev/null; then
-    echo "🔵 yay (AUR helper) not found. Installing..."
-    sudo pacman -S --needed base-devel git
-    git clone https://aur.archlinux.org/yay.git
-    cd yay
-    makepkg -si --noconfirm
-    cd ..
-    rm -rf yay
-fi
+echo "🔎 Detected Linux family: $LINUX_FAMILY"
 
-# Check if .NET 9.0 is installed
-if ! dotnet --list-sdks | grep -q '9.0'; then
-    echo "🔵 .NET 9.0 not found. Installing..."
-    yay -S --noconfirm dotnet-sdk-bin
-    echo "✅ .NET 9.0 installed successfully"
+# Function to install dependencies
+install_deps() {
+    case "$LINUX_FAMILY" in
+        arch)
+            echo "🔵 Installing dependencies on Arch..."
+            sudo pacman -Sy --needed --noconfirm base-devel git dotnet-sdk mpv
+            ;;
+        debian)
+            echo "🔵 Installing dependencies on Debian/Ubuntu..."
+            sudo apt update
+            sudo apt install -y wget git apt-transport-https mpv
+
+            OS_VERSION="unknown"
+            if [ -f /etc/os-release ]; then
+                OS_VERSION=$(grep 'VERSION_ID' /etc/os-release | cut -d '"' -f2)
+            fi
+            echo "Detected OS version: $OS_VERSION"
+
+            TMP_DEB=$(mktemp /tmp/packages-microsoft-prod.XXXX.deb)
+            wget https://packages.microsoft.com/config/ubuntu/$OS_VERSION/packages-microsoft-prod.deb -O "$TMP_DEB" || \
+            wget https://packages.microsoft.com/config/debian/$OS_VERSION/packages-microsoft-prod.deb -O "$TMP_DEB"
+            sudo dpkg -i "$TMP_DEB"
+            rm "$TMP_DEB"
+
+            sudo apt update
+            sudo apt install -y dotnet-sdk-9.0
+            ;;
+        fedora)
+            echo "🔵 Installing dependencies on Fedora..."
+            sudo dnf install -y git dotnet-sdk-9.0 mpv
+            ;;
+        opensuse)
+            echo "🔵 Installing dependencies on openSUSE..."
+            sudo zypper install -y git dotnet-sdk-9.0 mpv
+            ;;
+    esac
+}
+
+# 1. Check for dotnet SDK
+if ! command -v dotnet &> /dev/null; then
+    install_deps
 else
-    echo "🔵 .NET 9.0 is already installed"
+    echo "✅ Dotnet SDK found: $(dotnet --version)"
 fi
 
-# Check if in Tasky project directory
+# 2. Ensure we are in the Tasky project directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
 if [ ! -f "Tasky.csproj" ]; then
     echo "🔵 Tasky project not found in current directory"
     read -p "Do you want to clone the repository? (y/n): " clone_choice
     if [ "$clone_choice" = "y" ]; then
         git clone https://github.com/your-repo/tasky.git
-        cd tasky || exit
+        cd tasky || exit 1
     else
         echo "❌ Please run this script in the Tasky project directory"
         exit 1
     fi
 fi
 
-# Restore NuGet packages
+# 3. Restore and build Tasky
 echo "🔵 Restoring NuGet packages..."
 dotnet restore
 
-# Build the application
 echo "🔵 Building Tasky..."
 dotnet build -c Release
 
-# Create system-wide symlink
-echo "🔵 Making 'tasky' command available system-wide..."
-TARGET_PATH="$(pwd)/bin/Release/net9.0/Tasky.dll"
+# 4. Publish Tasky as a self-contained executable
+echo "🔵 Publishing Tasky..."
+dotnet publish -c Release -r linux-x64 --self-contained true -o ./publish /p:PublishSingleFile=true
 
-# Create a wrapper script in /usr/local/bin
-sudo tee /usr/local/bin/tasky > /dev/null <<EOF
-#!/bin/bash
-dotnet "$TARGET_PATH" "\$@"
-EOF
-
-sudo chmod +x /usr/local/bin/tasky
-
-# Install mpv for sound notifications if not present
-if ! command -v mpv &> /dev/null; then
-    echo "🔵 Installing mpv for sound notifications..."
-    sudo pacman -S --noconfirm mpv
+# 5. Find the published executable
+EXE_PATH=$(find ./publish -maxdepth 1 -type f -executable | head -n 1)
+if [ -z "$EXE_PATH" ]; then
+    echo "❌ Error: Published executable not found!"
+    exit 1
 fi
 
-# Create desktop entry (optional)
+# 6. Install system-wide
+echo "🔵 Installing Tasky to /usr/local/bin..."
+sudo cp "$EXE_PATH" /usr/local/bin/tasky
+sudo chmod +x /usr/local/bin/tasky
+
+# 7. Create desktop entry
 echo "🔵 Creating desktop entry..."
 sudo tee /usr/share/applications/tasky.desktop > /dev/null <<EOF
 [Desktop Entry]
@@ -84,20 +125,8 @@ Categories=Utility;Productivity;
 EOF
 
 echo ""
-echo "🎉 System-wide installation complete!"
-echo "You can now run Tasky from anywhere by typing:"
-echo "  tasky"
-
-
-
-
+echo "🎉 Installation complete!"
+echo "You can now run Tasky from anywhere by typing: tasky"
 echo ""
-
-
-
-
-
-
-echo "Thanks for installing my program"
 echo "Made by execRooted"
 echo "github: github.com/execRooted/Tasky"
