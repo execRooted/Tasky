@@ -3,7 +3,7 @@
 # Tasky System-Wide Installer for Arch Linux
 # Version 2.0
 
-echo "🚀 Starting Tasky Productivity Master 9000 system-wide installation..."
+echo "🚀 Starting Tasky system-wide installation..."
 
 # Check if running as root
 if [ "$EUID" -ne 0 ]; then
