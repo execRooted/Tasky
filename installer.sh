@@ -7,15 +7,16 @@ echo "🚀 === Tasky System-Wide Installer ==="
 # Function to detect Linux family
 detect_linux() {
     if command -v pacman &> /dev/null; then
-        echo "arch"
+        echo "Arch"
     elif command -v apt &> /dev/null; then
-        echo "debian"
+        echo "Debian"
     elif command -v dnf &> /dev/null; then
-        echo "fedora"
+        echo "Fedora"
     elif command -v zypper &> /dev/null; then
-        echo "opensuse"
+        echo "openSUSE"
     else
-        echo "unsupported"
+        echo "Unsupported OS. Exiting..."
+        exit 1
     fi
 }
 
@@ -30,11 +31,11 @@ echo "🔎 Detected Linux family: $LINUX_FAMILY"
 # Function to install dependencies
 install_deps() {
     case "$LINUX_FAMILY" in
-        arch)
+        Arch)
             echo "🔵 Installing dependencies on Arch..."
             sudo pacman -Sy --needed --noconfirm base-devel git dotnet-sdk mpv
             ;;
-        debian)
+        Debian)
             echo "🔵 Installing dependencies on Debian/Ubuntu..."
             sudo apt update
             sudo apt install -y wget git apt-transport-https mpv
@@ -54,11 +55,11 @@ install_deps() {
             sudo apt update
             sudo apt install -y dotnet-sdk-9.0
             ;;
-        fedora)
+        Fedora)
             echo "🔵 Installing dependencies on Fedora..."
             sudo dnf install -y git dotnet-sdk-9.0 mpv
             ;;
-        opensuse)
+        openSUSE)
             echo "🔵 Installing dependencies on openSUSE..."
             sudo zypper install -y git dotnet-sdk-9.0 mpv
             ;;
