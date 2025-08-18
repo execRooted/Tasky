@@ -1,61 +1,72 @@
 #!/bin/bash
+set -e
+clear
 
-# Uninstall script for Tasky
+echo "🚮 === Tasky Uninstaller ==="
 
-# Application name
-APP_NAME="Tasky"
-
-# System-wide data directory
-DATA_DIR="/var/lib/tasky"
-
-# Check if running as root
-if [ "$(id -u)" -ne 0 ]; then
-    echo "This uninstall script requires root privileges."
-    echo "Please run with sudo:"
-    echo "  sudo ./uninstall-tasky.sh"
-    exit 1
-fi
-
-# Confirm uninstallation
-read -p "Are you sure you want to completely uninstall $APP_NAME? [y/N] " confirm
-if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-    echo "Uninstallation cancelled."
-    exit 0
-fi
-
-# Step 1: Remove application binary
-echo -n "Removing application binary... "
-if rm -f "/usr/local/bin/tasky" 2>/dev/null || \
-   rm -f "/usr/bin/tasky" 2>/dev/null; then
-    echo "OK"
-else
-    echo "Not found"
-fi
-
-# Step 2: Remove system data directory
-echo -n "Removing system data directory ($DATA_DIR)... "
-if [ -d "$DATA_DIR" ]; then
-    if rm -rf "$DATA_DIR"; then
-        echo "OK"
+# Function to detect Linux family
+detect_linux() {
+    if command -v pacman &> /dev/null; then
+        echo "arch"
+    elif command -v apt &> /dev/null; then
+        echo "debian"
+    elif command -v dnf &> /dev/null; then
+        echo "fedora"
+    elif command -v zypper &> /dev/null; then
+        echo "opensuse"
     else
-        echo "FAILED"
-        echo "Warning: Could not remove $DATA_DIR"
-        echo "You may need to remove it manually."
+        echo "Unsupported OS"
+        exit 1
+    fi
+}
+
+LINUX_FAMILY=$(detect_linux)
+echo "🔎 Detected Linux family: $LINUX_FAMILY"
+
+# Remove the Tasky executable
+if [ -f /usr/local/bin/tasky ]; then
+    echo "🗑️ Removing /usr/local/bin/tasky..."
+    sudo rm /usr/local/bin/tasky
+    echo "✅ Tasky executable removed."
+else
+    echo "⚠️ Tasky executable not found in /usr/local/bin."
+fi
+
+# Remove desktop entry
+if [ -f /usr/share/applications/tasky.desktop ]; then
+    echo "🗑️ Removing Tasky desktop entry..."
+    sudo rm /usr/share/applications/tasky.desktop
+    echo "✅ Desktop entry removed."
+else
+    echo "⚠️ No desktop entry found for Tasky."
+fi
+
+# Optionally remove .NET SDK
+if command -v dotnet &> /dev/null; then
+    read -p "Do you want to remove the .NET SDK? [y/N]: " REMOVE_DOTNET
+    if [[ "$REMOVE_DOTNET" =~ ^[Yy]$ ]]; then
+        case "$LINUX_FAMILY" in
+            arch)
+                sudo pacman -Rns --noconfirm dotnet-sdk
+                ;;
+            debian)
+                sudo apt remove --purge -y dotnet-sdk-9.0
+                sudo apt autoremove -y
+                ;;
+            fedora)
+                sudo dnf remove -y dotnet-sdk-9.0
+                ;;
+            opensuse)
+                sudo zypper remove -y dotnet-sdk-9.0
+                ;;
+        esac
+        echo "✅ .NET SDK removed."
+    else
+        echo "⏭️ Skipped removing .NET SDK."
     fi
 else
-    echo "Not found"
+    echo "⚠️ .NET SDK not found, nothing to remove."
 fi
 
-# Step 3: Remove desktop entry (if exists)
-echo -n "Removing desktop entry... "
-if rm -f "/usr/share/applications/tasky.desktop" 2>/dev/null; then
-    echo "OK"
-else
-    echo "Not found"
-fi
-
-# Completion message
 echo ""
-echo "$APP_NAME has been completely uninstalled."
-echo "Note: Your task data in $DATA_DIR has been removed."
-exit 0
+echo "🧹 === Tasky uninstallation complete ==="
