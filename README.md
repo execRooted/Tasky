@@ -4,6 +4,13 @@
 It helps you manage tasks with priorities and categories.
 
 > Built for Arch Linux, with support for all major Linux distros.
+
+---
+
+If you found this project useful, buy me a coffee :)
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-%23FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/execrooted)
+
 ---
 ![Tasky](photos/tasky.png)
 
