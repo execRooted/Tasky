@@ -1,4 +1,4 @@
-# 📝 Tasky 
+#  Tasky 
 
 **Tasky** is a colorful, terminal-based to-do manager written in C# for Arch Linux.  
 It helps you manage tasks with priorities and categories.
@@ -16,17 +16,17 @@ If you found this project useful, buy me a coffee :)
 
 ---
 
-## ✨ Features
-- 🎨 **Colored UI** — priorities and statuses are color-coded for easy reading  
-- 📅 **Due dates & reminders** — get alerts for upcoming tasks  
-- 📊 **Statistics** — track your productivity score and task breakdown  
-- 📂 **Categories & priorities** — organize tasks effectively  
-- 🔍 **Search & filter** — find tasks quickly  
-- 🔔 **Sound notifications** — optional task reminder sounds using `mpv`
+##  Features
+-  **Colored UI** — priorities and statuses are color-coded for easy reading  
+-  **Due dates & reminders** — get alerts for upcoming tasks  
+-  **Statistics** — track your productivity score and task breakdown  
+-  **Categories & priorities** — organize tasks effectively  
+-  **Search & filter** — find tasks quickly  
+-  **Sound notifications** — optional task reminder sounds using `mpv`
 
 ---
 
-## 📦 Dependencies
+##  Dependencies
 Tasky requires:
 - **dotnet-sdk** (to build/run C#)
 - **mpv** (to play `.mp3`/`.wav` reminder sounds)
@@ -35,7 +35,7 @@ Tasky requires:
 
 ---
 
-## 🚀 Installation
+##  Installation
 Clone the repository and run the install script:
 
 
@@ -79,7 +79,7 @@ Tasks are saved in the same directory as the executable unless configured otherw
 
 
 
-<h2>❌ Uninstallation</h2>
+<h2> Uninstallation</h2>
 
 **To completely remove Tasky, run these commands in the project directory:**
 
@@ -102,6 +102,6 @@ The uninstaller will:
    
    ---
    
-   <h3>💡 Notes</h3>
+   <h3> Notes</h3>
 
    -  Task data is stored in tasks.json in the /var/lib/tasky directory by default — you can change this to whatever you prefer. It was added there for global access.
